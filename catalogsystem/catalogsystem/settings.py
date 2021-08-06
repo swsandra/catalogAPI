@@ -85,6 +85,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'catalogsystem.wsgi.application'
 
+# User model
+AUTH_USER_MODEL = 'products.User'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

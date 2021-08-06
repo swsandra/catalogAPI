@@ -1,7 +1,18 @@
 from decimal import Decimal
 
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
+
+class User(AbstractUser):
+    """ User model. Extends from Django User model.
+        This model requires user's email.
+    """
+    email = models.EmailField(
+        blank=False,
+        null=False,
+        unique=True
+    )
 
 class Brand(models.Model):
     """ Brand model

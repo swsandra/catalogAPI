@@ -1,12 +1,11 @@
 from django.shortcuts import render
-from django.contrib.auth.models import User
 from django.db import transaction
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Brand, Product
+from .models import Brand, Product, User
 
 from .serializers import (BrandSerializer, ProductSerializer, ProductSerializerForAnon, 
     UserSerializer)
