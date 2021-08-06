@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'products.apps.ProductsConfig'
 ]
 
@@ -124,3 +125,25 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Rest framework
+DEFAULT_RENDERER_CLASSES = (
+    'rest_framework.renderers.JSONRenderer',
+    'rest_framework.renderers.BrowsableAPIRenderer',
+)
+
+# if DEBUG:
+#     DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + (
+#         'rest_framework.renderers.BrowsableAPIRenderer',
+#     )
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
+}
