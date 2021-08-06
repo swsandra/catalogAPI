@@ -9,8 +9,22 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import os
+import sys
 
 from pathlib import Path
+
+def get_env(name, default=None):
+    """ Get env variables """
+    try:
+        return os.environ[name]
+    except Exception as exc:
+        if default is None:
+            print("Missing variable %s: %s"%(name, exc))
+            sys.exit(-1)
+        else:
+            print("Warning: Setting to default value %s=%s"%(name, default))
+            return default
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +34,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m)xr!nz*t%ws#5bon=j1cf3te2g7d&w)s063uq5t1r22t!xh29'
+SECRET_KEY = get_env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
