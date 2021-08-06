@@ -158,8 +158,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
 }
+
+# Login
+LOGIN_URL = 'rest_framework:login'
+LOGIN_REDIRECT_URL = 'api-root'
+LOGOUT_REDIRECT_URL = LOGIN_URL
