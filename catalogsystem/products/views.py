@@ -8,13 +8,19 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Brand, Product, User
 
 from .serializers import (BrandSerializer, ProductSerializer, ProductSerializerForAnon, 
-    UserSerializer)
+    UserSerializer, UserRegistrationSerializer)
 
 class UserViewSet(viewsets.ModelViewSet):
-    """ Viewset for brands """
+    """ Viewset for users """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    # serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, )
+
+    def get_serializer_class(self):
+        """ Get User serializer by action. """
+        if self.action == 'create':
+            return UserRegistrationSerializer
+        return UserSerializer
 
 class BrandViewSet(viewsets.ModelViewSet):
     """ Viewset for brands """
