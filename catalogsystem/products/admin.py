@@ -3,10 +3,10 @@ from .models import Brand, Product
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    """ Admin for brands """
+    """ Brands admin """
     list_display = ('id', 'name')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    """ Admin for products """
+    """ Products admin """
     list_display = ('id', 'sku', 'name', 'price', 'brand', 'visits')

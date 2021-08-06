@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.db import models
+from django.core.validators import MinValueValidator
 
 class Brand(models.Model):
     """ Brand model
@@ -32,7 +35,10 @@ class Product(models.Model):
     name = models.CharField(
         max_length=255
     )
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))])
     brand = models.ForeignKey(
         Brand,
         on_delete=models.CASCADE,
