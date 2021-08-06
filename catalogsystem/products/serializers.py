@@ -1,6 +1,15 @@
+from django.contrib.auth.models import User
+
 from rest_framework import serializers
 
 from .models import Brand, Product
+
+class UserSerializer(serializers.ModelSerializer):
+    """ User serializer """
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name', 'email' )
+        read_only_fields = ('id', )
 
 class BrandSerializer(serializers.ModelSerializer):
     """ Brand serializer """

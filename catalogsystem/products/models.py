@@ -51,33 +51,6 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} ({self.sku})"
 
-    # def set_sku(self, sku):
-    #     """ Sets SKU new value 
-
-    #         Parameters:
-    #         + sku
-    #     """
-    #     self.sku = sku
-    #     self.save()
-
-    # def set_name(self, name):
-    #     """ Sets name new value 
-
-    #         Parameters:
-    #         + name
-    #     """
-    #     self.name = name
-    #     self.save()
-    
-    # def set_price(self, price):
-    #     """ Sets price new value 
-
-    #         Parameters:
-    #         + price
-    #     """
-    #     self.price = price
-    #     self.save()
-
     def update_visits(self):
         """ Updates visits count """
         self.visits += 1
