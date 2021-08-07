@@ -2,15 +2,22 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from .models import Brand, Product, User
 
 class UserSerializer(serializers.ModelSerializer):
     """ User serializer """
+    url = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email' )
+        fields = ('id', 'url', 'username', 'first_name', 'last_name', 'email' )
         read_only_fields = ('id', )
+
+    def get_url(self, obj):
+        """ Get instance url """
+        request = self.context.get("request")
+        return reverse("user-detail", kwargs={'pk': obj.id}, request=request)
 
 class UserRegistrationSerializer(UserSerializer):
     """ User registration serializer """
@@ -105,21 +112,32 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class BrandSerializer(serializers.ModelSerializer):
     """ Brand serializer """
+    url = serializers.SerializerMethodField()
     class Meta:
         model = Brand
-        fields = ('id', 'name')
+        fields = ('id', 'url', 'name')
         read_only_fields = ('id', )
+
+    def get_url(self, obj):
+        """ Get instance url """
+        request = self.context.get("request")
+        return reverse("brand-detail", kwargs={'pk': obj.id}, request=request)
 
 class ProductSerializer(serializers.ModelSerializer):
     """ Product serializer """
+    url = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ('id', 'sku', 'name', 'price', 'brand', 'visits')
+        fields = ('id', 'url', 'sku', 'name', 'price', 'brand', 'visits')
         read_only_fields = ('id', 'visits') # Admins can't change visits
 
-class ProductSerializerForAnon(serializers.ModelSerializer):
+    def get_url(self, obj):
+        """ Get instance url """
+        request = self.context.get("request")
+        return reverse("product-detail", kwargs={'pk': obj.id}, request=request)
+
+class ProductSerializerForAnon(ProductSerializer):
     """ Product serializer for anonymous users """
-    class Meta:
-        model = Product
-        fields = ('sku', 'name', 'price', 'brand')
+    class Meta(ProductSerializer.Meta):
+        fields = ('url', 'sku', 'name', 'price', 'brand')
         read_only_fields = fields
