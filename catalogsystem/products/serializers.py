@@ -125,6 +125,7 @@ class BrandSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     """ Product serializer """
+    brand = BrandSerializer(read_only=True)
     url = serializers.SerializerMethodField()
     class Meta:
         model = Product
@@ -138,6 +139,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ProductSerializerForAnon(ProductSerializer):
     """ Product serializer for anonymous users """
+    brand = serializers.StringRelatedField()
     class Meta(ProductSerializer.Meta):
         fields = ('url', 'sku', 'name', 'price', 'brand')
         read_only_fields = fields
