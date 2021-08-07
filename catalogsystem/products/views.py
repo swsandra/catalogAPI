@@ -1,8 +1,12 @@
+from collections import OrderedDict
+
 from django.db import transaction
+from django.urls import NoReverseMatch
 
 from rest_framework import viewsets, status, routers
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Brand, Product, User
@@ -10,6 +14,36 @@ from .utils import send_email_notification
 
 from .serializers import (BrandSerializer, ProductSerializer, ProductSerializerForAnon, 
     UserSerializer, UserRegistrationSerializer, ChangePasswordSerializer)
+
+class APIRootView(routers.APIRootView):
+    """
+    Api Root View.
+    """
+    permission_classes = (AllowAny, )
+
+    def get(self, request, *args, **kwargs):
+        """ Implements base routers.APIRootView.get(), adding pop of users and brands endpoints """
+        # Return a plain {"name": "hyperlink"} response.
+        ret = OrderedDict()
+        namespace = request.resolver_match.namespace
+        for key, url_name in self.api_root_dict.items():
+            if namespace:
+                url_name = namespace + ':' + url_name
+            try:
+                ret[key] = reverse(
+                    url_name,
+                    args=args,
+                    kwargs=kwargs,
+                    request=request,
+                    format=kwargs.get('format')
+                )
+            except NoReverseMatch:
+                # Don't bail out if eg. no list routes exist, only detail routes.
+                continue
+        if self.request.user.is_anonymous:
+            ret.pop("users")
+            ret.pop("brands")
+        return Response(ret)
 
 class UserViewSet(viewsets.ModelViewSet):
     """ Viewset for users """
