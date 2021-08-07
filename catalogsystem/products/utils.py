@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.mail import send_mail
-import rest_framework
 
 from .models import User, Brand, Product
 
@@ -24,13 +23,13 @@ def send_email_notification(user, old_instance, instance, update=True):
     elif isinstance(old_instance, Product):
         subject = "Product"
         instance_type = "product"
-    subject += f" {old_instance.name}" # Product/brand old name
+    subject += f" {old_instance.name} with ID {old_instance.id}" # Product/brand old name
                                        # (if the name changed, admins can still identify it)
     subject += " updated" if update else " deleted" # Action performed
     # Message construction
     message = f"{user.first_name} {user.last_name} ({user.username}) has "
     if update:
-        message += f"updated the following fields:{instance.get_updated_info_str(old_instance)}"
+        message += f"updated the product {old_instance.name} (ID: {old_instance.id}).\nFields updated:{instance.get_updated_info_str(old_instance)}"
     else:
         message += f"removed the {instance_type}.\n{old_instance.get_info_str()}"
 
