@@ -1,6 +1,7 @@
 from django.db import transaction
 
-from rest_framework import generics, viewsets, status
+from rest_framework import viewsets, status, routers
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -20,32 +21,24 @@ class UserViewSet(viewsets.ModelViewSet):
         """ Get User serializer by action. """
         if self.action == 'create':
             return UserRegistrationSerializer
+        if self.action == 'change_password':
+            return ChangePasswordSerializer
         return UserSerializer
 
-class ChangePasswordView(generics.UpdateAPIView):
-    """ Updates user's password """
-    serializer_class = ChangePasswordSerializer
-    model = User
-    permission_classes = (IsAuthenticated, )
-
-    def get_object(self, queryset=None):
-        """ Gets current user """
-        obj = self.request.user
-        return obj
-
-    def update(self, request, *args, **kwargs):
-        """ Updates password """
-        self.object = self.get_object()
+    @action(detail=False, methods=['post'])
+    def change_password(self, request):
+        """ Updates user's password """
         serializer = self.get_serializer(data=request.data)
+        user = self.request.user
 
         if serializer.is_valid():
             # Check old password
-            if not self.object.check_password(serializer.validated_data.get("old_password")):
+            if not user.check_password(serializer.validated_data.get("old_password")):
                 _err = {"old_password": ["Wrong password."]}
                 return Response(_err, status=status.HTTP_400_BAD_REQUEST)
             # set_password also hashes user's password
-            self.object.set_password(serializer.validated_data.get("password"))
-            self.object.save()
+            user.set_password(serializer.validated_data.get("password"))
+            user.save()
             response = {
                     'status': 'success',
                     'code': status.HTTP_200_OK,
@@ -53,6 +46,7 @@ class ChangePasswordView(generics.UpdateAPIView):
                     'data': []
                 }
             return Response(response)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -90,6 +84,13 @@ class BrandViewSet(BaseViewSet):
     queryset = Brand.objects.all().order_by("name")
     serializer_class = BrandSerializer
     permission_classes = (IsAuthenticated, )
+
+    @action(detail=True, methods=['get'])
+    def products(self, request, pk=None):
+        """ Gets all brand products """
+        brand = self.get_object()
+        serializer = ProductSerializer(brand.products.all(), many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ProductViewSet(BaseViewSet):
     """ Viewset for products """
