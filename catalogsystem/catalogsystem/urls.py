@@ -24,5 +24,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router_products.urls)),
     path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
-    re_path(r'^$', RedirectView.as_view(pattern_name='rest_framework:login')),
+    re_path(r'^$', RedirectView.as_view(url="/api/")),
 ] + products_urlpatterns
