@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.db import transaction
 
 from rest_framework import generics, viewsets, status
@@ -6,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Brand, Product, User
+from .utils import send_email_notification
 
 from .serializers import (BrandSerializer, ProductSerializer, ProductSerializerForAnon, 
     UserSerializer, UserRegistrationSerializer, ChangePasswordSerializer)
@@ -55,13 +55,43 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response(response)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class BrandViewSet(viewsets.ModelViewSet):
+class BaseViewSet(viewsets.ModelViewSet):
+    """ Base viewset for brands and products. To allow notifications on updates/deletions """
+
+    def update(self, request, *args, **kwargs):
+        """ Updates instance and sends email to notify other users """
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        old_instance = self.get_object() # To notify changes
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        # Send email notification
+        send_email_notification(self.request.user, old_instance, instance)
+
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        """ Deletes instance and sends email to notify other users """
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        # Send email notification
+        send_email_notification(self.request.user, instance, None, False)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class BrandViewSet(BaseViewSet):
     """ Viewset for brands """
     queryset = Brand.objects.all().order_by("name")
     serializer_class = BrandSerializer
     permission_classes = (IsAuthenticated, )
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductViewSet(BaseViewSet):
     """ Viewset for products """
     queryset = Product.objects.all().order_by("name")
     # serializer_class = ProductSerializer
