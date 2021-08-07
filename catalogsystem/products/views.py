@@ -1,14 +1,14 @@
 from django.shortcuts import render
 from django.db import transaction
 
-from rest_framework import viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Brand, Product, User
 
 from .serializers import (BrandSerializer, ProductSerializer, ProductSerializerForAnon, 
-    UserSerializer, UserRegistrationSerializer)
+    UserSerializer, UserRegistrationSerializer, ChangePasswordSerializer)
 
 class UserViewSet(viewsets.ModelViewSet):
     """ Viewset for users """
@@ -21,6 +21,39 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return UserRegistrationSerializer
         return UserSerializer
+
+class ChangePasswordView(generics.UpdateAPIView):
+    """ Updates user's password """
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = (IsAuthenticated, )
+
+    def get_object(self, queryset=None):
+        """ Gets current user """
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        """ Updates password """
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.validated_data.get("old_password")):
+                _err = {"old_password": ["Wrong password."]}
+                return Response(_err, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes user's password
+            self.object.set_password(serializer.validated_data.get("password"))
+            self.object.save()
+            response = {
+                    'status': 'success',
+                    'code': status.HTTP_200_OK,
+                    'message': 'Password updated successfully',
+                    'data': []
+                }
+            return Response(response)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class BrandViewSet(viewsets.ModelViewSet):
     """ Viewset for brands """

@@ -67,6 +67,42 @@ class UserRegistrationSerializer(UserSerializer):
 
         return instance
 
+class ChangePasswordSerializer(serializers.Serializer):
+    """ Serializer to allow password changes """
+    old_password = serializers.CharField(style={'input_type': 'password'},
+                                         allow_blank=False, write_only=True)
+    password = serializers.CharField(style={'input_type': 'password'},
+                                     allow_blank=False, write_only=True)
+    confirm_password = serializers.CharField(style={'input_type': 'password'},
+                                             allow_blank=False, write_only=True)
+
+    def validate_password(self, value):
+        """ Validates new password """
+        try:
+            validate_password(value)
+        except ValidationError as exc:
+            raise serializers.ValidationError(list(exc))
+        return value
+
+    def is_valid(self, raise_exception=False):
+        """ Validates password and password confirmation are received """
+        if not self.initial_data.get('old_password') or not self.initial_data.get('password') \
+            or not self.initial_data.get('confirm_password'):
+            _err = {}
+            if not self.initial_data.get('old_password'):
+                _err['old_password'] = ['This field is required.']
+            if not self.initial_data.get('password'):
+                _err['password'] = ['This field is required.']
+            if not self.initial_data.get('confirm_password'):
+                _err['confirm_password'] = ['Please confirm your password.']
+            raise serializers.ValidationError(_err)
+
+        if self.initial_data.get('password') != self.initial_data.get('confirm_password'):
+            _err = {'error': 'Passwords do not match.'}
+            raise serializers.ValidationError(_err)
+
+        return super(ChangePasswordSerializer, self).is_valid(raise_exception)
+
 class BrandSerializer(serializers.ModelSerializer):
     """ Brand serializer """
     class Meta:

@@ -18,10 +18,11 @@ from django.urls import path, include, re_path
 from django.views.generic.base import RedirectView
 
 from products.urls import router as router_products
+from products.urls import urlpatterns as products_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router_products.urls)),
     path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
-    re_path(r'^$', RedirectView.as_view(pattern_name='login')),
-]
+    re_path(r'^$', RedirectView.as_view(pattern_name='rest_framework:login')),
+] + products_urlpatterns
