@@ -18,7 +18,8 @@ class Brand(models.Model):
     """ Brand model
     
     Attributes:
-    + name
+
+    + name: brand name (unique)
     """
     name = models.CharField(
         max_length=30,
@@ -50,11 +51,16 @@ class Product(models.Model):
     """ Product model
 
     Attributes:
-    + sku
-    + name
-    + price
-    + brand
-    + visits
+
+    + sku: Stock-keeping unit (unique)
+
+    + name: product name
+
+    + price: product price
+
+    + brand: product brand
+
+    + visits: visits count of anonymous users
     """
     sku = models.CharField(
         max_length=255,

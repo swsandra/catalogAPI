@@ -75,7 +75,7 @@ class UserRegistrationSerializer(UserSerializer):
         return instance
 
 class ChangePasswordSerializer(serializers.Serializer):
-    """ Serializer to allow password changes """
+    """ Password change serializer """
     old_password = serializers.CharField(style={'input_type': 'password'},
                                          allow_blank=False, write_only=True)
     password = serializers.CharField(style={'input_type': 'password'},
@@ -92,7 +92,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         return value
 
     def is_valid(self, raise_exception=False):
-        """ Validates password and password confirmation are received """
+        """ Validates password and password confirmation are both received """
         if not self.initial_data.get('old_password') or not self.initial_data.get('password') \
             or not self.initial_data.get('confirm_password'):
             _err = {}
@@ -137,7 +137,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return reverse("product-detail", kwargs={'pk': obj.id}, request=request)
 
 class ProductListSerializer(ProductSerializer):
-    """ Product serializer for list/retrieve """
+    """ Product serializer for list and retrieve actions """
     brand = BrandSerializer(read_only=True)
 
 class ProductSerializerForAnon(ProductSerializer):

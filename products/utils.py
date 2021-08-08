@@ -7,12 +7,18 @@ def send_email_notification(user, old_instance, instance, update=True):
     """ Sends an email notification to all users except the one performing the change
     
         Parameters:
-        + user: User changing the instance
-        + old_instance: Old instance (updated or removed)
-        + instance: Instance with updated information
-        + update: whether the instance was updated or not (deleted)
+
+        + user: User changing the instance.
+
+        + old_instance: Old instance (updated or removed).
+
+        + instance: Instance with updated information (None when old instance was removed).
+
+        + update: whether the instance was updated or not (when False is received,
+        deletion is assumed)
     """
-    if update and not instance.changed(old_instance): # Instance didn't change, notification is not necessary
+    if update and not instance.changed(old_instance): # Instance didn't change,
+                                                      # notification is not necessary
         return
     # Subject construction
     subject = ""
