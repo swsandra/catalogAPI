@@ -13,7 +13,7 @@ from .models import Brand, Product, User
 from .utils import send_email_notification
 
 from .serializers import (BrandSerializer, ProductSerializer, ProductSerializerForAnon, 
-    UserSerializer, UserRegistrationSerializer, ChangePasswordSerializer)
+    UserSerializer, UserRegistrationSerializer, ChangePasswordSerializer, ProductListSerializer)
 
 class APIRootView(routers.APIRootView):
     """
@@ -145,6 +145,8 @@ class ProductViewSet(BaseViewSet):
             Anonymous users cannot see database ID nor product visits. """
         if self.request.user.is_anonymous:
             return ProductSerializerForAnon
+        if self.action in ['list', 'retrieve']:
+            return ProductListSerializer
         return ProductSerializer
 
     def retrieve(self, request, *args, **kwargs):

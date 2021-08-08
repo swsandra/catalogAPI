@@ -125,7 +125,6 @@ class BrandSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     """ Product serializer """
-    brand = BrandSerializer(read_only=True)
     url = serializers.SerializerMethodField()
     class Meta:
         model = Product
@@ -136,6 +135,10 @@ class ProductSerializer(serializers.ModelSerializer):
         """ Get instance url """
         request = self.context.get("request")
         return reverse("product-detail", kwargs={'pk': obj.id}, request=request)
+
+class ProductListSerializer(ProductSerializer):
+    """ Product serializer for list/retrieve """
+    brand = BrandSerializer(read_only=True)
 
 class ProductSerializerForAnon(ProductSerializer):
     """ Product serializer for anonymous users """
