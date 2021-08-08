@@ -115,7 +115,7 @@ class BaseViewSet(viewsets.ModelViewSet):
 
 class BrandViewSet(BaseViewSet):
     """ Viewset for brands """
-    queryset = Brand.objects.all().order_by("name")
+    queryset = Brand.objects.all().order_by("id")
     serializer_class = BrandSerializer
     permission_classes = (IsAuthenticated, )
 
@@ -128,7 +128,7 @@ class BrandViewSet(BaseViewSet):
 
 class ProductViewSet(BaseViewSet):
     """ Viewset for products """
-    queryset = Product.objects.all().order_by("name")
+    queryset = Product.objects.all().order_by("id")
     # serializer_class = ProductSerializer
     permission_classes = (IsAuthenticated, )
 
